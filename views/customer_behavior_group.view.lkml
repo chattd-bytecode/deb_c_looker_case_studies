@@ -23,14 +23,14 @@ view: customer_behavior_group {
   # Dimensions
   dimension: days_from_purchase {
     description: "The number of days since a customer placed his or her most recent order on the website."
-    sql: CURRENT_DATE() - ${TABLE}.most_recent_purchase ;;
+    sql: DATE_DIFF(CURRENT_DATE(),DATE (${TABLE}.most_recent_purchase),  DAY) ;;
   }
 
   dimension: is_active {
     description: "Customer is considered active if a purchase has been     made in the last 90 days"
     label: "Is Active"
     type: yesno
-    sql: ${days_from_purchase}<=90;;
+    sql: ${days_from_purchase} <= 90;;
   }
 
   dimension: lifetime_orders {

@@ -106,7 +106,7 @@ view: order_items {
     description: "Canceled, returned and future orders excluded"
     label: "Valid order"
     type: string
-    sql: CASE WHEN order_items.shipped_at IS NOT NULL AND order_items.returned_at IS NOT NULL AND ${order_items.created_date} < CURRENT_DATE() THEN 'Yes' ELSE 'No' END;;
+    sql: CASE WHEN (order_items.shipped_at IS NOT NULL) OR (order_items.returned_at IS NOT NULL) OR (${order_items.created_date} < CURRENT_DATE()) THEN 'Yes' ELSE 'No' END;;
   }
 
   dimension: yesterday {
@@ -156,7 +156,7 @@ view: order_items {
     description: "Total Gross Margin Amount / Total Gross Revenue"
     label: "Gross margin percentage"
     type: number
-    sql: ${total_gross_margin_amount}/${total_gross_revenue} ;;
+    sql: ${total_gross_margin_amount}/NULLIF(${total_gross_revenue},0) ;;
     value_format_name: percent_2
   }
 
@@ -209,14 +209,14 @@ view: order_items {
     type: count
   }
 
-  measure: revenue_percentage {
-    # hidden: yes
-    description: "Percentage of the total revenue"
-    label: "Revenue Percentage"
-    type: number
-    sql: ${total_gross_margin_amount}/${total_gross_revenue} ;;
-    value_format_name: percent_2
-  }
+  # measure: revenue_percentage {
+  #   # hidden: yes
+  #   description: "Percentage of the total revenue"
+  #   label: "Revenue Percentage"
+  #   type: number
+  #   sql: ${total_gross_revenue}/${total_revenue} ;;
+  #   value_format_name: percent_2
+  # }
 
   dimension_group: shipped {
     type: time
@@ -240,10 +240,7 @@ view: order_items {
     label: "Total cost"
     type: sum
     sql: ${products.cost} ;;
-    filters: {
-      field: valid_orders
-      value: "Yes"
-    }
+    value_format_name: usd_0
   }
 
   measure: total_gross_margin_amount {
@@ -261,8 +258,7 @@ view: order_items {
     description: "Total revenue from completed sales (canceled, returned and future orders excluded)"
     label: "Total gross revenue"
     type: sum
-    # sql: IFNULL(${sale_price},0);;
-    sql: ${sale_price} ;;
+    sql: ${sale_price};;
     filters: {
       field: valid_orders
       value: "Yes"

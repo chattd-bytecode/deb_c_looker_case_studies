@@ -71,23 +71,24 @@ view: users {
     sql: ${TABLE}.longitude ;;
   }
 
-    dimension: months_as_customer {
-    label: "Months as Customer"
-    type: number
-    sql: DATEDIFF(month,${created_date},CURRENT_DATE()) ;;
-  }
-
   dimension: month_tiers {
-    label: "Sign Up Tiers by Month Cohort"
+    label: "Months Since Sign Up (6 Month Tiers)"
     type: tier
-    tiers: [1,6,12,24,36,48,60]
+    tiers: [1,6,12,18,24,30,36]
     style: integer
-    sql: ${months_as_customer} ;;
+    sql: ${months_since_signup} ;;
   }
 
   dimension: new_customer {
     type: string
-    sql: CASE WHEN DATE_DIFF(CURRENT_DATE(),DATE (DATE(users.created_at )),  DAY) <= 90 THEN 'New customer' ELSE 'Long-term customer' END;;
+    sql: CASE WHEN DATE_DIFF(CURRENT_DATE(),DATE (DATE ${users.created_date}),  DAY) <= 90 THEN 'New customer' ELSE 'Long-term customer' END;;
+  }
+
+  dimension: new_versus_old_customer {
+    type: string
+    sql: CASE WHEN DATE_DIFF(CURRENT_DATE(),DATE (${created_raw}),  DAY) <= 30 THEN 'Last Month'
+              WHEN DATE_DIFF(CURRENT_DATE(),DATE (${created_raw}),  DAY) > 365 AND DATE_DIFF(CURRENT_DATE(),DATE (users.created_at),  DAY) < 730 THEN 'Last Year'
+              ELSE NULL END;;
   }
 
   dimension: postal_code {
@@ -134,13 +135,13 @@ view: users {
   measure: average_days_since_signup {
     description: "Average number of days between a customer initially registering on the website and now"
     type: average
-    sql: DATE_DIFF(DATE ${created_raw}, CURRENT_DATE(), DAY) ;;
+    sql: DATE_DIFF(CURRENT_DATE(),${users.created_date}, DAY) ;;
   }
 
   measure: average_months_since_signup {
     description: "Average number of months between a customer initially registering on the website and now"
     type: average
-    sql: DATE_DIFF(DATE ${created_raw}, CURRENT_DATE(), MONTH) ;;
+    sql: DATE_DIFF(CURRENT_DATE(),${users.created_date}, MONTH) ;;
   }
 
   measure: count {
@@ -162,13 +163,13 @@ view: users {
   measure: days_since_signup {
     description: "The number of days since a customer has signed up on the website"
     type: string
-    sql: DATE_DIFF(CURRENT_DATE(),${created_date},  DAY);;
+    sql: DATE_DIFF(CURRENT_DATE(),${users.created_date}, DAY);;
   }
 
-  measure: months_since_signup {
+  dimension: months_since_signup {
     description: "The number of months since a customer has signed up on the website"
     type: number
-    sql: DATE_DIFF(DATE ${created_raw}, CURRENT_DATE(), MONTH) ;;
+    sql: DATE_DIFF(CURRENT_DATE(),${users.created_date}, MONTH) ;;
   }
 
   measure: total_age {
