@@ -51,6 +51,14 @@ view: users {
     sql: ${TABLE}.first_name ;;
   }
 
+  dimension: full_name {
+    label: "Customer's Full Name"
+    description: "Customer's Full Name"
+    type: string
+    sql: ${first_name} || ' ' || ${last_name} ;;
+  }
+
+
   dimension: gender {
     type: string
     sql: ${TABLE}.gender ;;

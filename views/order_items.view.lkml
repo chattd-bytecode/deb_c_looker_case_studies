@@ -209,6 +209,13 @@ view: order_items {
     type: count
   }
 
+  measure: order_count {
+    type: count_distinct
+    sql: ${order_id};;
+    value_format: "0.000,\" K\""
+  }
+
+
   # measure: revenue_percentage {
   #   # hidden: yes
   #   description: "Percentage of the total revenue"

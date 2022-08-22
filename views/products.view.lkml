@@ -33,7 +33,7 @@ view: products {
     }
     link: {
       label: "Brand Comparison View"
-      url: "https://looker.bytecode.io/dashboards/FfkOUvIhjDQhMjwCzabnHf?Category={{ _filters['products.category'] }}&Brand={{products._rendered_value }}"
+      url: "https://looker.bytecode.io/dashboards/FfkOUvIhjDQhMjwCzabnHf?Category={{ _filters['products.category'] }}&Brand={{products.brand }}"
     }
     drill_fields: [category,brand,name]
   }
@@ -43,7 +43,7 @@ view: products {
     sql: ${TABLE}.category ;;
     link: {
       label: "Category Comparison View"
-      url: "https://looker.bytecode.io/dashboards/FfkOUvIhjDQhMjwCzabnHf?Category={{ products._rendered_value }}&Brand={{_filters['products.brand'] }}"
+      url: "https://looker.bytecode.io/dashboards/FfkOUvIhjDQhMjwCzabnHf?Category={{ products.category }}&Brand={{_filters['products.brand'] }}"
     }
   }
 
